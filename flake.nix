@@ -13,8 +13,20 @@
         inherit (inputs.self.packages.${system}) shortener;
       };
 
+      vm = inputs.self.nixosConfigurations.vm.config.system.build.vm;
+
       default = inputs.self.packages.${system}.shortener;
     }) inputs.nixpkgs.legacyPackages;
+
+    nixosModules.default = ./shortener/module.nix;
+
+    nixosConfigurations.vm = inputs.nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [
+        inputs.self.nixosModules.default
+        ./vm.nix
+      ];
+    };
 
     devShells = builtins.mapAttrs (system: pkgs: {
       default = pkgs.mkShell {
