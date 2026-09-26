@@ -4,14 +4,14 @@ buildGoModule {
   pname = "shortener";
   version = "0.1.0";
 
-  # Only the Go sources go into the build input, so editing the nix
-  # files that live alongside them does not trigger a rebuild.
+  # Only the Go sources go into the build input, so unrelated files in
+  # the repo do not trigger a rebuild.
   src = lib.fileset.toSource {
-    root = ./.;
+    root = ../shortener;
     fileset = lib.fileset.unions [
-      ./go.mod
-      ./go.sum
-      (lib.fileset.fileFilter (f: f.hasExt "go") ./.)
+      ../shortener/go.mod
+      ../shortener/go.sum
+      (lib.fileset.fileFilter (f: f.hasExt "go") ../shortener)
     ];
   };
 
