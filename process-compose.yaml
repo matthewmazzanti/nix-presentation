@@ -19,7 +19,7 @@ processes:
         command: redis-cli -s "$REDIS_SOCKET" ping
 
   shortener:
-    command: uvicorn shortener:app --reload
+    command: go run .
     working_dir: shortener
     depends_on:
       postgres:

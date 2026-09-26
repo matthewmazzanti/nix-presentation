@@ -7,24 +7,24 @@
 
   outputs = inputs: {
     packages = builtins.mapAttrs (system: pkgs: {
-      hello = pkgs.hello;
+      shortener = pkgs.callPackage ./shortener/package.nix { };
 
-      default = inputs.self.packages.${system}.hello;
+      image = pkgs.callPackage ./shortener/image.nix {
+        inherit (inputs.self.packages.${system}) shortener;
+      };
+
+      default = inputs.self.packages.${system}.shortener;
     }) inputs.nixpkgs.legacyPackages;
 
     devShells = builtins.mapAttrs (system: pkgs: {
       default = pkgs.mkShell {
         packages = [
-          (pkgs.python3.withPackages (ps: [
-            ps.fastapi
-            ps.uvicorn
-            ps.psycopg
-            ps.psycopg-pool
-            ps.redis
-          ]))
+          pkgs.go
+          pkgs.gopls
           pkgs.postgresql
           pkgs.redis
           pkgs.process-compose
+          pkgs.docker-compose
           pkgs.just
         ];
 
