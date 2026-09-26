@@ -42,6 +42,40 @@ vm:
     mkdir -p .data
     NIX_DISK_IMAGE=.data/shortener.qcow2 nix run .#vm
 
+# Build the Amazon Machine Image (a raw disk plus image-info.json)
+ami:
+    nix build --no-link --print-out-paths .#ami
+
+# Upload the AMI disk to EBS and register it as an AMI (needs AWS credentials and AWS_REGION)
+ami-register name=("shortener-" + datetime("%Y%m%d-%H%M")):
+    #!/usr/bin/env bash
+    set -euo pipefail
+    info="$(nix build --no-link --print-out-paths .#ami)/nix-support/image-info.json"
+    file=$(jq -r .file "$info")
+    boot_mode=$(jq -r .boot_mode "$info")
+    size_gib=$(jq -r '(.logical_bytes | tonumber) / 1073741824 | ceil' "$info")
+    case "$(jq -r .system "$info")" in
+      x86_64-linux)  arch=x86_64 ;;
+      aarch64-linux) arch=arm64 ;;
+      *) echo "unsupported system" >&2; exit 1 ;;
+    esac
+
+    echo "uploading $file to an EBS snapshot..." >&2
+    snapshot=$(coldsnap upload --wait --omit-zero-blocks --description "{{name}}" "$file")
+    echo "snapshot: $snapshot" >&2
+
+    aws ec2 register-image \
+        --name "{{name}}" \
+        --architecture "$arch" \
+        --boot-mode "$boot_mode" \
+        --virtualization-type hvm \
+        --ena-support \
+        --sriov-net-support simple \
+        --imds-support v2.0 \
+        --root-device-name /dev/xvda \
+        --block-device-mappings "DeviceName=/dev/xvda,Ebs={SnapshotId=$snapshot,VolumeSize=$size_gib,VolumeType=gp3,DeleteOnTermination=true}" \
+        --query ImageId --output text
+
 # Remove local service data
 clean:
     rm -rf .data

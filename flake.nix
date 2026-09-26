@@ -18,10 +18,17 @@
 
       vm = inputs.self.nixosConfigurations.vm.config.system.build.vm;
 
+      ami = inputs.self.nixosConfigurations.ec2.config.system.build.amazonImage;
+
       default = inputs.self.packages.${system}.shortener;
     }) inputs.nixpkgs.legacyPackages;
 
-    nixosModules.default = ./nix/module.nix;
+    nixosModules = {
+      # The shortener service itself: services.shortener.*
+      default = ./nix/module.nix;
+      # The full stack: postgres, redis, and the shortener wired together
+      stack = ./nix/stack.nix;
+    };
     homeManagerModules.default = ./home/module.nix;
 
     homeConfigurations.demo = inputs.home-manager.lib.homeManagerConfiguration {
@@ -33,8 +40,18 @@
       system = "x86_64-linux";
       modules = [
         inputs.self.nixosModules.default
+        inputs.self.nixosModules.stack
         inputs.home-manager.nixosModules.home-manager
         ./nix/vm.nix
+      ];
+    };
+
+    nixosConfigurations.ec2 = inputs.nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [
+        inputs.self.nixosModules.default
+        inputs.self.nixosModules.stack
+        ./nix/ec2.nix
       ];
     };
 
@@ -47,6 +64,9 @@
           pkgs.redis
           pkgs.process-compose
           pkgs.docker-compose
+          pkgs.awscli2
+          pkgs.coldsnap
+          pkgs.jq
           pkgs.just
         ];
 
