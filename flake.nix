@@ -25,6 +25,7 @@
           pkgs.postgresql
           pkgs.redis
           pkgs.process-compose
+          pkgs.just
         ];
 
         # Sockets instead of TCP ports so we never collide with services already running on the host.
