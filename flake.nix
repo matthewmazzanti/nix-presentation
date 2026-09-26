@@ -20,12 +20,18 @@
       default = inputs.self.packages.${system}.shortener;
     }) inputs.nixpkgs.legacyPackages;
 
-    nixosModules.default = ./nix/module.nix;
+    nixosModules = {
+      # The shortener service itself: services.shortener.*
+      default = ./nix/module.nix;
+      # The full stack: postgres, redis, and the shortener wired together
+      stack = ./nix/stack.nix;
+    };
 
     nixosConfigurations.vm = inputs.nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       modules = [
         inputs.self.nixosModules.default
+        inputs.self.nixosModules.stack
         ./nix/vm.nix
       ];
     };
@@ -34,6 +40,7 @@
       system = "x86_64-linux";
       modules = [
         inputs.self.nixosModules.default
+        inputs.self.nixosModules.stack
         ./nix/ec2.nix
       ];
     };
