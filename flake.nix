@@ -9,10 +9,10 @@
 
   outputs = inputs: {
     packages = builtins.mapAttrs (system: pkgs: {
-      shortener = pkgs.callPackage ./shortener/package.nix { };
+      shortener = pkgs.callPackage ./nix/package.nix { };
       shortctl = pkgs.callPackage ./shortctl/package.nix { };
 
-      image = pkgs.callPackage ./shortener/image.nix {
+      image = pkgs.callPackage ./nix/image.nix {
         inherit (inputs.self.packages.${system}) shortener;
       };
 
@@ -21,7 +21,7 @@
       default = inputs.self.packages.${system}.shortener;
     }) inputs.nixpkgs.legacyPackages;
 
-    nixosModules.default = ./shortener/module.nix;
+    nixosModules.default = ./nix/module.nix;
     homeManagerModules.default = ./home/module.nix;
 
     homeConfigurations.demo = inputs.home-manager.lib.homeManagerConfiguration {
@@ -34,7 +34,7 @@
       modules = [
         inputs.self.nixosModules.default
         inputs.home-manager.nixosModules.home-manager
-        ./vm.nix
+        ./nix/vm.nix
       ];
     };
 

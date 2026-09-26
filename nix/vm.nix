@@ -38,7 +38,7 @@
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
-    users.demo = import ./home/demo.nix;
+    users.demo = import ../home/demo.nix;
   };
 
   # Demo conveniences: serial console, auto-login the configured user.

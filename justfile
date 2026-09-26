@@ -39,8 +39,9 @@ compose *args:
 
 # Build and boot a NixOS VM running postgres, redis, and the shortener
 vm:
-    nix run .#vm
+    mkdir -p .data
+    NIX_DISK_IMAGE=.data/shortener.qcow2 nix run .#vm
 
 # Remove local service data
 clean:
-    rm -rf .data *.qcow2
+    rm -rf .data
