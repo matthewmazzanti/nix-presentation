@@ -1,0 +1,28 @@
+version: "0.5"
+
+processes:
+  postgres:
+    command: |
+      mkdir -p "$DATA_DIR"
+      [ -d "$PGDATA" ] || initdb --auth=trust
+      exec postgres -k "$PGHOST" -c listen_addresses=''
+    readiness_probe:
+      exec:
+        command: pg_isready
+
+  redis:
+    command: |
+      mkdir -p "$DATA_DIR"
+      exec redis-server --port 0 --unixsocket "$REDIS_SOCKET" --dir "$DATA_DIR"
+    readiness_probe:
+      exec:
+        command: redis-cli -s "$REDIS_SOCKET" ping
+
+  shortener:
+    command: uvicorn shortener:app --reload
+    working_dir: shortener
+    depends_on:
+      postgres:
+        condition: process_healthy
+      redis:
+        condition: process_healthy
