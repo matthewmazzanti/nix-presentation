@@ -3,11 +3,14 @@
 
   inputs = {
     nixpkgs.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.zst";
+    home-manager.url = "github:nix-community/home-manager";
+    home-manager.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = inputs: {
     packages = builtins.mapAttrs (system: pkgs: {
       shortener = pkgs.callPackage ./shortener/package.nix { };
+      shortctl = pkgs.callPackage ./shortctl/package.nix { };
 
       image = pkgs.callPackage ./shortener/image.nix {
         inherit (inputs.self.packages.${system}) shortener;
@@ -19,11 +22,18 @@
     }) inputs.nixpkgs.legacyPackages;
 
     nixosModules.default = ./shortener/module.nix;
+    homeManagerModules.default = ./home/module.nix;
+
+    homeConfigurations.demo = inputs.home-manager.lib.homeManagerConfiguration {
+      pkgs = inputs.nixpkgs.legacyPackages.x86_64-linux;
+      modules = [ ./home/demo.nix ];
+    };
 
     nixosConfigurations.vm = inputs.nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       modules = [
         inputs.self.nixosModules.default
+        inputs.home-manager.nixosModules.home-manager
         ./vm.nix
       ];
     };
