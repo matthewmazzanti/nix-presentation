@@ -7,9 +7,9 @@
 
   outputs = inputs: {
     packages = builtins.mapAttrs (system: pkgs: {
-      shortener = pkgs.callPackage ./shortener/package.nix { };
+      shortener = pkgs.callPackage ./nix/package.nix { };
 
-      image = pkgs.callPackage ./shortener/image.nix {
+      image = pkgs.callPackage ./nix/image.nix {
         inherit (inputs.self.packages.${system}) shortener;
       };
 
@@ -18,13 +18,13 @@
       default = inputs.self.packages.${system}.shortener;
     }) inputs.nixpkgs.legacyPackages;
 
-    nixosModules.default = ./shortener/module.nix;
+    nixosModules.default = ./nix/module.nix;
 
     nixosConfigurations.vm = inputs.nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       modules = [
         inputs.self.nixosModules.default
-        ./vm.nix
+        ./nix/vm.nix
       ];
     };
 
