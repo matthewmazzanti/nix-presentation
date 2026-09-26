@@ -2,3 +2,4 @@
 shortener/shortener
 .direnv/
 result
+*.qcow2
