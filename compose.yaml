@@ -1,0 +1,39 @@
+# Runs the nix-built shortener image alongside postgres and redis.
+# Build and load the image first with `just image`, or use `just compose`.
+services:
+  postgres:
+    image: docker.io/library/postgres:17
+    environment:
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 2s
+      timeout: 2s
+      retries: 15
+
+  redis:
+    image: docker.io/library/redis:7
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 2s
+      retries: 15
+
+  shortener:
+    # podman loads nix images as localhost/shortener:latest, docker as shortener:latest
+    image: ${SHORTENER_IMAGE:-shortener:latest}
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres/postgres
+      REDIS_URL: redis://redis:6379
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  postgres:

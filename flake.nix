@@ -9,6 +9,10 @@
     packages = builtins.mapAttrs (system: pkgs: {
       shortener = pkgs.callPackage ./shortener/package.nix { };
 
+      image = pkgs.callPackage ./shortener/image.nix {
+        inherit (inputs.self.packages.${system}) shortener;
+      };
+
       default = inputs.self.packages.${system}.shortener;
     }) inputs.nixpkgs.legacyPackages;
 
@@ -20,6 +24,7 @@
           pkgs.postgresql
           pkgs.redis
           pkgs.process-compose
+          pkgs.docker-compose
           pkgs.just
         ];
 
