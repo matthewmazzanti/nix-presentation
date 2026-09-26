@@ -15,6 +15,8 @@
 
       vm = inputs.self.nixosConfigurations.vm.config.system.build.vm;
 
+      ami = inputs.self.nixosConfigurations.ec2.config.system.build.amazonImage;
+
       default = inputs.self.packages.${system}.shortener;
     }) inputs.nixpkgs.legacyPackages;
 
@@ -28,6 +30,14 @@
       ];
     };
 
+    nixosConfigurations.ec2 = inputs.nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [
+        inputs.self.nixosModules.default
+        ./nix/ec2.nix
+      ];
+    };
+
     devShells = builtins.mapAttrs (system: pkgs: {
       default = pkgs.mkShell {
         packages = [
@@ -37,6 +47,9 @@
           pkgs.redis
           pkgs.process-compose
           pkgs.docker-compose
+          pkgs.awscli2
+          pkgs.coldsnap
+          pkgs.jq
           pkgs.just
         ];
 
