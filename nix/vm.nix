@@ -7,8 +7,15 @@
   # module directly: it supplies the root filesystem and bootloader.
   imports = [ "${modulesPath}/virtualisation/qemu-vm.nix" ];
 
-  # Demo conveniences: serial console, auto-login root.
-  services.getty.autologinUser = "root";
+  users.users.demo.isNormalUser = true;
+  home-manager = {
+    useGlobalPkgs = true;
+    useUserPackages = true;
+    users.demo = import ../home/demo.nix;
+  };
+
+  # Demo conveniences: serial console, auto-login the configured user.
+  services.getty.autologinUser = "demo";
 
   virtualisation = {
     graphics = false;
