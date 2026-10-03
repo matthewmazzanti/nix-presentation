@@ -4,6 +4,7 @@ sub_title: ""
 author: Nikita Wootten & Matthew Mazzanti
 options:
   end_slide_shorthand: true
+  h1_slide_titles: true
 ---
 
 # What is Nix anyways?
@@ -11,6 +12,7 @@ options:
 
 <!-- column: 0 -->
 ![](assets/holy-trinity.jpg)
+
 [Source: Reddit](https://www.reddit.com/r/linuxmemes/comments/17n0nzb/the_holy_trinity/)
 
 <!-- column: 1 -->
