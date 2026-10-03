@@ -6,19 +6,14 @@ options:
   end_slide_shorthand: true
 ---
 
-What is Nix anyways?
-===
-
+# What is Nix anyways?
 <!-- column_layout: [2, 1] -->
 
 <!-- column: 0 -->
-
 ![](assets/holy-trinity.jpg)
-
 [Source: Reddit](https://www.reddit.com/r/linuxmemes/comments/17n0nzb/the_holy_trinity/)
 
 <!-- column: 1 -->
-
 Nix is:
 * A language
 * A package manager
@@ -27,45 +22,67 @@ Nix is:
 
 ---
 
-Introducing our subject
-===
+# Overview
+
+* Quick tour of the hits of nix
+* Repo available if you want to go deeper: https://github.com/nikitawootten/the-case-for-nix/
 
 ---
 
-Starting from the bottom: ephemeral shell environments
-===
+# Nix Shell
+
+```
+# Run btop ephemerally
+nix run nixpkgs#btop
+# Create a shell with btop available
+nix shell nixpkgs#btop
+```
+
+- Allows you to try out any nix package locally with just a command
+- Doesn't install permanently
+- "Try before you buy"
 
 ---
 
-Reproducible development environments
-===
+# Nix Develop
+
+```
+nix develop
+```
+
+- Create a shell with a configured developer environment
+- Allows standardized set of packages/tools
+- Uses a lockfile like package-lock.json or uv.lock so versions stay stable
 
 ---
 
-Packaging
-===
+# Packaging a simple app
+
+- Source: ./shortener/main.go
+- Packaging: ./nix/package.nix
 
 ---
 
-Containerization
-===
+# Running in a NixOS System (Bare Metal)
 
 ---
 
-Turn the application into a service
-===
+# Containerizing the package
+
+- Source: ./nix/docker.nix
 
 ---
 
-Build the whole machine
-===
+# Running in a NixOS VM
+
+- Source: ./nix/vm.nix
 
 ---
 
-Deployment
-===
+# Running as an AMI
+
+- Source: ./nix/ami.nix
 
 ---
 
-Appendix A: What's the deal with Flakes?
-===
+# Appendix A: What's the deal with Flakes?

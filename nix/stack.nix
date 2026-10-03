@@ -1,7 +1,7 @@
 # The application stack: postgres, redis, and the shortener, wired up
 # over local unix sockets. Exposed as nixosModules.stack; every machine
 # that runs the app imports it and adds only its substrate-specific
-# parts (see vm.nix and ec2.nix).
+# parts (see vm.nix and ami.nix).
 { ... }:
 
 {

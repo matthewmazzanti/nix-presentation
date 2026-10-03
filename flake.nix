@@ -12,7 +12,7 @@
       shortener = pkgs.callPackage ./nix/package.nix { };
       shortctl = pkgs.callPackage ./shortctl/package.nix { };
 
-      image = pkgs.callPackage ./nix/image.nix {
+      image = pkgs.callPackage ./nix/docker.nix {
         inherit (inputs.self.packages.${system}) shortener;
       };
 
@@ -51,7 +51,7 @@
       modules = [
         inputs.self.nixosModules.default
         inputs.self.nixosModules.stack
-        ./nix/ec2.nix
+        ./nix/ami.nix
       ];
     };
 
@@ -68,6 +68,7 @@
           pkgs.coldsnap
           pkgs.jq
           pkgs.just
+          pkgs.presenterm
         ];
 
         # Sockets instead of TCP ports so we never collide with services already running on the host.
