@@ -31,7 +31,7 @@ Nix is:
 
 # Nix Shell
 
-```
+```sh
 # Run btop ephemerally
 nix run nixpkgs#btop
 # Create a shell with btop available
@@ -46,7 +46,7 @@ nix shell nixpkgs#btop
 
 # Nix Develop
 
-```
+```sh
 nix develop
 ```
 
