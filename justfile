@@ -76,6 +76,10 @@ ami-register name=("shortener-" + datetime("%Y%m%d-%H%M")):
         --block-device-mappings "DeviceName=/dev/xvda,Ebs={SnapshotId=$snapshot,VolumeSize=$size_gib,VolumeType=gp3,DeleteOnTermination=true}" \
         --query ImageId --output text
 
+# Present the README as a slideshow
+present:
+    presenterm README.md
+
 # Remove local service data
 clean:
     rm -rf .data
