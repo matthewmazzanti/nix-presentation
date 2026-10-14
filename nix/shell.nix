@@ -29,6 +29,7 @@ mkShell {
     export DATA_DIR=$PWD/.data
     export PGDATA=$DATA_DIR/postgres
     export PGHOST=$DATA_DIR
+    export PGDATABASE=postgres
     export REDIS_SOCKET=$DATA_DIR/redis.sock
     export DATABASE_URL="postgresql:///postgres?host=$PGHOST"
     export REDIS_URL="unix://$REDIS_SOCKET"
