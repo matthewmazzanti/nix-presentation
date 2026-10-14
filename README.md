@@ -8,6 +8,7 @@ options:
 ---
 
 # What is Nix?
+<!-- pause -->
 <!-- column_layout: [1, 1] -->
 <!-- column: 0 -->
 ![](assets/holy-trinity.jpg)
@@ -56,7 +57,7 @@ curl -fsS "http://127.0.0.1:8000/$code/stats"
 But shell scripts suck:
 <!-- pause -->
 - What runtime environment are you on?
-- What version of `sed`, `curl` and dependencies do you have?
+- What version of `jq`, `curl` and dependencies do you have?
 <!-- pause -->
 - Do it wrong and your script is broken on a PDP 11 and a nerd on the internet yells at you
 
@@ -145,3 +146,5 @@ But Deploying apps sucks:
 # Packaging/Deploying the backend (Demo)
 
 ---
+
+# Subscribe and Smash that like button
