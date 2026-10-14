@@ -147,4 +147,4 @@ But Deploying apps sucks:
 
 ---
 
-# Subscribe and Smash that like button
+# Like and Subscribe
