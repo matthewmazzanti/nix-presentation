@@ -56,31 +56,7 @@
     };
 
     devShells = builtins.mapAttrs (system: pkgs: {
-      default = pkgs.mkShell {
-        packages = [
-          pkgs.go
-          pkgs.gopls
-          pkgs.postgresql
-          pkgs.redis
-          pkgs.process-compose
-          pkgs.docker-compose
-          pkgs.awscli2
-          pkgs.coldsnap
-          pkgs.jq
-          pkgs.just
-          pkgs.presenterm
-        ];
-
-        # Sockets instead of TCP ports so we never collide with services already running on the host.
-        shellHook = ''
-          export DATA_DIR=$PWD/.data
-          export PGDATA=$DATA_DIR/postgres
-          export PGHOST=$DATA_DIR
-          export REDIS_SOCKET=$DATA_DIR/redis.sock
-          export DATABASE_URL="postgresql:///postgres?host=$PGHOST"
-          export REDIS_URL="unix://$REDIS_SOCKET"
-        '';
-      };
+      default = pkgs.callPackage ./nix/shell.nix { };
     }) inputs.nixpkgs.legacyPackages;
   };
 }
