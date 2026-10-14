@@ -30,7 +30,7 @@ What can nix do?
 
 ---
 
-# Project: link simple link shortener
+# Project: link shortener
 <!-- speaker_note: ensure `just dev` is running for the below curl commands to resolve -->
 Simple web service with a connected database
 
@@ -57,6 +57,7 @@ But shell scripts suck:
 <!-- pause -->
 - What runtime environment are you on?
 - What version of `sed`, `curl` and dependencies do you have?
+<!-- pause -->
 - Do it wrong and your script is broken on a PDP 11 and a nerd on the internet yells at you
 
 ---
