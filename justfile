@@ -10,7 +10,7 @@ default:
 
 # Start postgres, redis, and the shortener via process-compose
 dev:
-    nix develop -c process-compose up
+    nix develop -c process-compose -f process-compose.yaml up
 
 # Build the container image with nix and load it into the container runtime
 image:
@@ -78,7 +78,7 @@ ami-register name=("shortener-" + datetime("%Y%m%d-%H%M")):
 
 # Present the README as a slideshow
 present:
-    presenterm README.md
+    presenterm -x README.md
 
 # Remove local service data
 clean:
