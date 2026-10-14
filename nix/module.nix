@@ -26,6 +26,12 @@ in
       description = "Port to listen on.";
     };
 
+    openFirewall = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Open the firewall for the shortener port.";
+    };
+
     databaseUrl = lib.mkOption {
       type = lib.types.str;
       # Peer auth over the local postgres socket; the OS user "shortener"
@@ -42,6 +48,8 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    networking.firewall.allowedTCPPorts = lib.mkIf cfg.openFirewall [ cfg.port ];
+
     systemd.services.shortener = {
       description = "URL shortener";
       wantedBy = [ "multi-user.target" ];

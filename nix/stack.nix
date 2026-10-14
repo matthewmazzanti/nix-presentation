@@ -1,7 +1,7 @@
 # The application stack: postgres, redis, and the shortener, wired up
 # over local unix sockets. Exposed as nixosModules.stack; every machine
 # that runs the app imports it and adds only its substrate-specific
-# parts (see vm.nix and ami.nix).
+# parts (see vm.nix).
 { ... }:
 
 {
@@ -21,7 +21,8 @@
 
   services.shortener = {
     enable = true;
-    # Traffic arrives on the machine's NIC, not loopback.
+    # Listen on the machine's NIC, not loopback. The firewall stays
+    # closed unless the host sets openFirewall = true.
     host = "0.0.0.0";
   };
 
@@ -29,8 +30,6 @@
     after = [ "postgresql.service" "redis-shortener.service" ];
     requires = [ "postgresql.service" "redis-shortener.service" ];
   };
-
-  networking.firewall.allowedTCPPorts = [ 8000 ];
 
   system.stateVersion = "26.11";
 }

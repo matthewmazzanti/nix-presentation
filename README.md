@@ -7,20 +7,32 @@ options:
   h1_slide_titles: true
 ---
 
-# Overview
+# What is Nix?
+<!-- column_layout: [1, 1] -->
+<!-- column: 0 -->
+![](assets/holy-trinity.jpg)
+[Image Source: Andreas Fuchs](https://boinkor.net/2024/04/what-nix-will-have-been/)
 
-- Quick tour of the hits of nix
-- Repo available if you want to go deeper: https://github.com/nikitawootten/the-case-for-nix/
+<!-- column: 1 -->
+Nix is:
+- A package manager
+- A language
+- An operating system
+- Poorly named
 
 ---
 
-# Introducing our subject: a link simple link shortener
+# A better question to ask
+<!-- column_layout: [1, 2, 1] -->
+<!-- column: 1 -->
+<!-- pause -->
+What can nix do?
 
+---
+
+# Project: link simple link shortener
 <!-- speaker_note: ensure `just dev` is running for the below curl commands to resolve -->
-
 Simple web service with a connected database
-
-- API surface:
 
 ```bash +exec
 /// set -euo pipefail
@@ -29,74 +41,27 @@ code=$(curl -fsS http://127.0.0.1:8000/links \
   -H 'Content-Type: application/json' \
   -d '{"url":"https://nixos.org"}' | jq -er .code)
 echo "Short link: http://127.0.0.1:8000/$code"
+
 # Follow short link
 curl -fsS -D - -o /dev/null "http://127.0.0.1:8000/$code" | grep Location
+
 # Get short link hit count
 curl -fsS "http://127.0.0.1:8000/$code/stats"
 ```
 
-- Writes to a Postgres database, uses Redis for a cache
-- Shell wrapper
-
 ---
 
-# Super simple application, what's the catch?
-
-There are so many opportunities for things to go wrong.
-
-- Onboarding new devs
-- Building and deploying the application
-
----
-
-# Shell scripts suck
-
+# Lets build a shell script!
+<!-- pause -->
+But shell scripts suck:
+<!-- pause -->
 - What runtime environment are you on?
-- What version of `sed`, `curl` and other runtime dependencies do you have?
-
-<!-- speaker_note: GNU vs BSD `sed` a good example here -->
-
+- What version of `sed`, `curl` and dependencies do you have?
 - Do it wrong and your script is broken on a PDP 11 and a nerd on the internet yells at you
 
 ---
 
-# Developer environments suck
-
-- Every developer environment is mostly cruft; subtle differences add up
-- Always a huge runbook of commands nobody understands to get the environment set up
-- Then it breaks when someone adds something weird and you debug for 4 hours before formatting their disk
-
----
-
-# Packaging and deployment sucks
-
-- Docker's approach: Just ship the dev laptop
-- Isn't "reproducible", ie can run more later at a later time
-- Same build at different points in time produces different outputs
-
----
-
-# Introducing Nix
-
-<!-- column_layout: [2, 1] -->
-
-<!-- column: 0 -->
-![](assets/holy-trinity.jpg)
-
-[Image Source: Andreas Fuchs](https://boinkor.net/2024/04/what-nix-will-have-been/)
-
-<!-- column: 1 -->
-Nix is:
-- A package manager
-- A language
-- An operating system
-- A bit of a mess
-
----
-
-# Packaging the shell script
-
-<!-- speaker_note: Nix is a functional language vaguely resembling JSON with functions, derivations are a core language feature -->
+# Creating a shell script with nix
 
 ```nix
 { writeShellApplication, curl, jq }:
@@ -106,6 +71,9 @@ writeShellApplication {
   text = builtins.readFile ./shortctl.sh;
 }
 ```
+---
+
+# Creating a shell script with nix
 
 Evaluating this expression produces a "derivation" (package):
 
@@ -114,20 +82,32 @@ nix build .#shortctl
 nix eval .#shortctl --raw
 ```
 
-<!-- speaker_note: show the structure mirroring the root FS with the script in a bin folder -->
+---
+
+# Installing the script
+
+---
+
+# Lets build a developer environment!
+<!-- pause -->
+But dev environments suck:
+<!-- pause -->
+- Dev machines are mostly cruft
+- Huge runbook of commands to get set up
+- Then it breaks and takes forever to fix
 
 ---
 
 # Dev environments
 
-- Run ephemeral commands with nix run/shell. Doesn't clog up your system over time
-- Prepare a full dev environment for your team ahead of time, stays in sync through git & updates
-- Combine with tools like Direnv
+- Run ephemeral commands with `nix run` and `nix shell`
+- Prepare and sync a full dev environment for your team
+- Direnv gets a shoutout here
 
 ```nix
-{ mkShell, go, gopls, postgresql, redis, process-compose, jq, just, presenterm }:
+{ mkShell, go, gopls, postgresql, redis, process-compose, jq, just }:
 mkShell {
-  packages = [ go gopls postgresql redis process-compose jq just presenterm ];
+  packages = [ go gopls postgresql redis process-compose jq just ];
   shellHook = ''
     export DATA_DIR=$PWD/.data
     export PGDATA=$DATA_DIR/postgres
@@ -139,10 +119,25 @@ mkShell {
 }
 ```
 
+---
+
+# Dev environments
+
 ```bash +exec
 nix build .#devShells.x86_64-linux.default
 nix eval .#devShells.x86_64-linux.default --raw
 ```
+
+---
+
+# Lets deploy the app!
+<!-- pause -->
+But Deploying apps sucks:
+<!-- pause -->
+- Differences between prod & your laptop
+- Dockers solution: Ship the laptop
+- That can break too, if your deps change
+- Isn't "reproducible"
 
 ---
 

@@ -6,8 +6,6 @@
   redis,
   process-compose,
   docker-compose,
-  awscli2,
-  coldsnap,
   jq,
   just,
   presenterm,
@@ -21,8 +19,6 @@ mkShell {
     redis
     process-compose
     docker-compose
-    awscli2
-    coldsnap
     jq
     just
     presenterm

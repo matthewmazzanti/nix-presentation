@@ -18,8 +18,6 @@
 
       vm = inputs.self.nixosConfigurations.vm.config.system.build.vm;
 
-      ami = inputs.self.nixosConfigurations.ec2.config.system.build.amazonImage;
-
       default = inputs.self.packages.${system}.shortener;
     }) inputs.nixpkgs.legacyPackages;
 
@@ -43,15 +41,6 @@
         inputs.self.nixosModules.stack
         inputs.home-manager.nixosModules.home-manager
         ./nix/vm.nix
-      ];
-    };
-
-    nixosConfigurations.ec2 = inputs.nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      modules = [
-        inputs.self.nixosModules.default
-        inputs.self.nixosModules.stack
-        ./nix/ami.nix
       ];
     };
 
