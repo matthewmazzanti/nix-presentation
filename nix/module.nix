@@ -1,4 +1,6 @@
-# NixOS module: runs the shortener as a hardened systemd service.
+# NixOS module: runs the shortener as a hardened systemd service, backed
+# by a local postgres and a dedicated redis instance, all wired up over
+# unix sockets.
 { config, lib, pkgs, ... }:
 
 let
@@ -31,35 +33,36 @@ in
       default = false;
       description = "Open the firewall for the shortener port.";
     };
-
-    databaseUrl = lib.mkOption {
-      type = lib.types.str;
-      # Peer auth over the local postgres socket; the OS user "shortener"
-      # maps to the postgres role of the same name.
-      default = "postgresql://shortener@/shortener?host=/run/postgresql";
-      description = "PostgreSQL connection URL.";
-    };
-
-    redisUrl = lib.mkOption {
-      type = lib.types.str;
-      default = "unix:///run/redis-shortener/redis.sock";
-      description = "Redis connection URL.";
-    };
   };
 
   config = lib.mkIf cfg.enable {
     networking.firewall.allowedTCPPorts = lib.mkIf cfg.openFirewall [ cfg.port ];
 
+    services.postgresql = {
+      enable = true;
+      ensureDatabases = [ "shortener" ];
+      ensureUsers = [{
+        name = "shortener";
+        ensureDBOwnership = true;
+      }];
+    };
+
+    # A dedicated redis instance, reachable only via its unix socket.
+    services.redis.servers.shortener.enable = true;
+
     systemd.services.shortener = {
       description = "URL shortener";
       wantedBy = [ "multi-user.target" ];
-      after = [ "network.target" ];
+      after = [ "network.target" "postgresql.service" "redis-shortener.service" ];
+      requires = [ "postgresql.service" "redis-shortener.service" ];
 
       environment = {
         HOST = cfg.host;
         PORT = toString cfg.port;
-        DATABASE_URL = cfg.databaseUrl;
-        REDIS_URL = cfg.redisUrl;
+        # Peer auth over the local postgres socket; the OS user "shortener"
+        # maps to the postgres role of the same name.
+        DATABASE_URL = "postgresql://shortener@/shortener?host=/run/postgresql";
+        REDIS_URL = "unix:///run/redis-shortener/redis.sock";
       };
 
       serviceConfig = {
