@@ -144,7 +144,3 @@ But Deploying apps sucks:
 ---
 
 # Packaging/Deploying the backend (Demo)
-
----
-
-# Like and Subscribe
